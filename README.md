@@ -13,3 +13,8 @@ require (
 
 go get github.com/naoina/toml
 go get go.mongodb.org/mongo-driver/mongo
+go get github.com/ethereum/go-ethereum
+
+\*\* ethclient import 시에 에러가 발생
+go get github.com/ethereum/go-ethereum/rpc@v1.13.10
+위 패키지 추가 인스톨 해줌!

@@ -5,3 +5,5 @@ nftCollection = "nftCollection"
 nft = "nft"
 tx = "tx"
 
+[node]
+uri = "uri~~"
