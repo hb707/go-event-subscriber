@@ -1,8 +1,15 @@
 package repository
 
-type Repository struct{}
+import "event/config"
 
-func NewRepository() *Repository {
-	r := Repository{}
-	return &r
+type Repository struct{
+	config *config.Config
+}
+
+func NewRepository(config *config.Config) (*Repository, error) {
+	r := Repository{
+		config: config,
+	}
+
+	return &r, nil
 }
