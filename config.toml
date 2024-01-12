@@ -1,7 +1,7 @@
 [database.mongo]
-dataSource = ""
-db = ""
-nftCollection = ""
-nft = ""
-tx = ""
+dataSource = "mongodb://localhost:27017"
+db = "go-event-subscriber"
+nftCollection = "nftCollection"
+nft = "nft"
+tx = "tx"
 
