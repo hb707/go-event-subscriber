@@ -1,9 +1,0 @@
-[database.mongo]
-dataSource = "mongodb://localhost:27017"
-db = "go-event-subscriber"
-nftCollection = "nftCollection"
-nft = "nft"
-tx = "tx"
-
-[node]
-uri = "uri~~"
