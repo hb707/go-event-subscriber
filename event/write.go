@@ -45,12 +45,24 @@ func (c *Catch) startToCatch(events <- chan []ethTypes.Log) {
 		txList := make(map[common.Hash]*ethTypes.Transaction)
 
 		for _, e := range event {
-			if _, ok := txList[e.TxHash]; !ok {
-				if tx, pending, err := c.client.TransactionByHash(ctx, e.TxHash); err != nil {
+			hash := e.TxHash
+
+			if _, ok := txList[hash]; !ok {
+				if tx, pending, err := c.client.TransactionByHash(ctx, hash); err != nil {
 					if !pending {
-						txList[e.TxHash] = tx
+						txList[hash] = tx
 					}
 				}
+			}
+
+			// reverted tx 제외
+			if e.Removed {
+				continue
+			} else if et, ok := c.needToCatchEvent[e.Topics[0]]; !ok {
+				// @TODO : 캐치하지 않는 이벤트 발생시 로그로만 남겨두기
+			} else {
+				// 캐치할 이벤트 발생시 NeedToCatchEventFunc 함수 실행
+				et.NeedToCatchEventFunc(&e, txList[hash])
 			}
 		}
 	}
