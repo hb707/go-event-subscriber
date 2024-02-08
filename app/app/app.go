@@ -34,12 +34,15 @@ func NewApp(config *config.Config) *App {
 		if a.repository, err = repository.NewRepository(config); err != nil {
 			panic(err)
 		}
-		if a.scan, eventChan, err = event.NewScan(config, a.client); err != nil {
-			panic(err)
-		}
+
 		if a.catch, err = event.NewCatch(config, a.client, eventChan); err != nil {
 			panic(err)
 		}
+
+		if a.scan, eventChan, err = event.NewScan(config, a.client, a.catch.GetEventToCatch()); err != nil {
+			panic(err)
+		}
+
 
 	}
 

@@ -22,30 +22,31 @@ type Scan struct {
 	client *ethclient.Client
 }
 
-func NewScan(config *config.Config, client *ethclient.Client) (*Scan, chan []ethTypes.Log, error) {
+func NewScan(config *config.Config, client *ethclient.Client, eventToCatch []common.Hash) (*Scan, chan []ethTypes.Log, error) {
 	s := &Scan{
 		config: config,
 		client: client,
 	}
 
 	eventLog := make(chan []ethTypes.Log, 100)
-	go s.lookingScan(config.Node.StartBlock, eventLog) // 백그라운드에서 계속 실행되어야하므로 고루틴 생성
+	scanCollection := common.HexToAddress("")
+	go s.lookingScan(config.Node.StartBlock, eventLog, scanCollection, eventToCatch) // 백그라운드에서 계속 실행되어야하므로 고루틴 생성
 	
 	return s, eventLog, nil
 }
 
 func (s *Scan) lookingScan(
 	startBlock int64, 
-	// @TODO : 스캔할 Collection,
-	// @TODO : 캐치할 Event,
 	eventLog chan <- []ethTypes.Log, // 스캔한 이벤트를 담아서 보낼 채널
+	collectionToScan common.Address, // 스캔할 컨트랙트 주소
+	eventToCatch []common.Hash,
 ) {
 	startReadBlock, to := startBlock, uint64(0)
 
 	// fromBlock, toBlock, Addresses, Topics
 	s.FilterQuery = ethereum.FilterQuery{
-		Addresses: []common.Address{},
-		Topics: [][]common.Hash{},
+		Addresses: []common.Address{collectionToScan},
+		Topics: [][]common.Hash{eventToCatch},
 		FromBlock: big.NewInt(startReadBlock),
 	}
 

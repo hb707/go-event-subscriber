@@ -67,3 +67,12 @@ func (c *Catch) startToCatch(events <- chan []ethTypes.Log) {
 		}
 	}
 }
+
+func (c *Catch) GetEventToCatch() []common.Hash {
+	eventsToCatch := make([]common.Hash, 0)
+
+	for e := range c.needToCatchEvent {
+		eventsToCatch = append(eventsToCatch, e)
+	}
+	return eventsToCatch
+}	
