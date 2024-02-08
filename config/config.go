@@ -20,6 +20,7 @@ type Config struct {
 
 	Node struct {
 		Uri string
+		StartBlock int64
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"event/event"
 	"event/repository"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -15,6 +16,7 @@ type App struct{
 
 	repository *repository.Repository
 	scan *event.Scan
+	eventLog chan []types.Log
 }
 
 func NewApp(config *config.Config) *App {
@@ -31,7 +33,7 @@ func NewApp(config *config.Config) *App {
 		if a.repository, err = repository.NewRepository(config); err != nil {
 			panic(err)
 		}
-		if a.scan, err = event.NewScan(config, a.client); err != nil {
+		if a.scan, a.eventLog, err = event.NewScan(config, a.client); err != nil {
 			panic(err)
 		}
 	}
