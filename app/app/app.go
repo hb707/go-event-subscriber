@@ -16,7 +16,7 @@ type App struct{
 
 	repository *repository.Repository
 	scan *event.Scan
-	eventLog chan []types.Log
+	catch *event.Catch
 }
 
 func NewApp(config *config.Config) *App {
@@ -25,6 +25,7 @@ func NewApp(config *config.Config) *App {
 	}
 
 	var err error
+	var eventChan chan []types.Log
 
 	// client는 app에 추가될 다른 패키지 모듈에 추가
 	if a.client, err = ethclient.Dial(config.Node.Uri); err != nil {
@@ -33,9 +34,13 @@ func NewApp(config *config.Config) *App {
 		if a.repository, err = repository.NewRepository(config); err != nil {
 			panic(err)
 		}
-		if a.scan, a.eventLog, err = event.NewScan(config, a.client); err != nil {
+		if a.scan, eventChan, err = event.NewScan(config, a.client); err != nil {
 			panic(err)
 		}
+		if a.catch, err = event.NewCatch(config, a.client, eventChan); err != nil {
+			panic(err)
+		}
+
 	}
 
 	return &a
