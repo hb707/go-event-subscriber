@@ -22,17 +22,16 @@ type Scan struct {
 	client *ethclient.Client
 }
 
-func NewScan(config *config.Config, client *ethclient.Client, eventToCatch []common.Hash) (*Scan, chan []ethTypes.Log, error) {
+func NewScan(config *config.Config, client *ethclient.Client, eventToCatch []common.Hash, eventChan chan []ethTypes.Log) (*Scan, chan []ethTypes.Log, error) {
 	s := &Scan{
 		config: config,
 		client: client,
 	}
 
-	eventLog := make(chan []ethTypes.Log, 100)
-	scanCollection := common.HexToAddress("")
-	go s.lookingScan(config.Node.StartBlock, eventLog, scanCollection, eventToCatch) // 백그라운드에서 계속 실행되어야하므로 고루틴 생성
+	scanCollection := common.HexToAddress("0x07ca6BD954C4959bEb6ebde8C952E759D8c770FF")
+	go s.lookingScan(config.Node.StartBlock, eventChan, scanCollection, eventToCatch) // 백그라운드에서 계속 실행되어야하므로 고루틴 생성
 	
-	return s, eventLog, nil
+	return s, eventChan, nil
 }
 
 func (s *Scan) lookingScan(
@@ -64,7 +63,7 @@ func (s *Scan) lookingScan(
 				s.FilterQuery.ToBlock = big.NewInt(int64(to))
 
 				tryCount := 1
-				
+
 				Retry: 
 				if logs, err := s.client.FilterLogs(ctx, s.FilterQuery); err != nil {
 					if tryCount == 3 {

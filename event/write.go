@@ -4,6 +4,7 @@ import (
 	"context"
 	"event/config"
 	"event/types"
+	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -27,7 +28,7 @@ func NewCatch(config *config.Config, client *ethclient.Client, eventChan chan []
 	// 캐치해야하는 이벤트 정의!
 	// Transfer이벤트 : Transfer(address, address, uint256)에 대한 해시값에 대해 transfer함수를 할당함
 	c.needToCatchEvent = map[common.Hash]types.NeedToCatchEvent{
-		common.BytesToHash(crypto.Keccak256([]byte("Transfer(address, address, uint256)"))) : {
+		common.BytesToHash(crypto.Keccak256([]byte("Transfer(address,address,uint256)"))) : {
 			NeedToCatchEventFunc: c.Transfer,
 		},
 	}
@@ -37,7 +38,10 @@ func NewCatch(config *config.Config, client *ethclient.Client, eventChan chan []
 	return c, nil
 }
 
-func (c *Catch) Transfer(e *ethTypes.Log, tx *ethTypes.Transaction) {}
+func (c *Catch) Transfer(e *ethTypes.Log, tx *ethTypes.Transaction) {
+	// fmt.Printf("%+v\n", e)
+	fmt.Printf("%+v\n", tx)
+}
 
 func (c *Catch) startToCatch(events <- chan []ethTypes.Log) {
 	for event := range events {
@@ -48,10 +52,12 @@ func (c *Catch) startToCatch(events <- chan []ethTypes.Log) {
 			hash := e.TxHash
 
 			if _, ok := txList[hash]; !ok {
-				if tx, pending, err := c.client.TransactionByHash(ctx, hash); err != nil {
+				if tx, pending, err := c.client.TransactionByHash(ctx, hash); err == nil {
 					if !pending {
 						txList[hash] = tx
 					}
+				} else {
+					continue
 				}
 			}
 

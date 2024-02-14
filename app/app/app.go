@@ -5,7 +5,7 @@ import (
 	"event/event"
 	"event/repository"
 
-	"github.com/ethereum/go-ethereum/core/types"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -25,7 +25,8 @@ func NewApp(config *config.Config) *App {
 	}
 
 	var err error
-	var eventChan chan []types.Log
+	eventLog := make(chan []ethTypes.Log, 100)
+
 
 	// client는 app에 추가될 다른 패키지 모듈에 추가
 	if a.client, err = ethclient.Dial(config.Node.Uri); err != nil {
@@ -35,16 +36,15 @@ func NewApp(config *config.Config) *App {
 			panic(err)
 		}
 
-		if a.catch, err = event.NewCatch(config, a.client, eventChan); err != nil {
+		if a.catch, err = event.NewCatch(config, a.client, eventLog); err != nil {
 			panic(err)
 		}
 
-		if a.scan, eventChan, err = event.NewScan(config, a.client, a.catch.GetEventToCatch()); err != nil {
+		if a.scan, _, err = event.NewScan(config, a.client, a.catch.GetEventToCatch(), eventLog); err != nil {
 			panic(err)
 		}
-
-
 	}
 
-	return &a
+	for {
+	}
 }
